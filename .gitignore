@@ -1,13 +1,12 @@
-# Dependências
+# Dependências (Obrigatório ignorar)
 node_modules/
 jspm_packages/
 
-# Build do Electron e Binários
+# Build do Electron e Binários finais
 dist/
 release/
 *.exe
 *.msi
-*.zip
 *.dmg
 
 # Logs e Cache
@@ -23,19 +22,30 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Arquivos do Jogo (Evite subir o client do Talisman para o Git)
+# --- ARQUIVOS DO JOGO (Não enviar para o GitHub) ---
+# Ignoramos pastas que o Launcher cria ao baixar o client
 /download/
 /files_to_update/
-client.exe
+/music/
+/script/
+/local/
+/misc/
+
+# Ignoramos extensões de dados do jogo
 *.dll
 *.ini
 *.bat
 *.lua
 *.csv
-/music/
-/script/
-/local/
-/misc/
+*.zip
+*.dat
+
+# --- GARANTIR QUE O CÓDIGO FONTE SEJA ENVIADO ---
+# Se o updater.js estiver numa pasta ignorada, estas linhas forçam a inclusão
+!updater.js
+!main.js
+!package.json
+!package-lock.json
 
 # Ambiente
 .env
