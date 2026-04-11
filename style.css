@@ -1,0 +1,414 @@
+/* --- FUNDAMENTALS --- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Quicksand", sans-serif;
+  user-select: none;
+  -webkit-user-select: none; /*  */
+}
+
+body {
+  width: 900px;
+  height: 550px;
+  overflow: hidden;
+  background-color: #000;
+  -webkit-app-region: drag;
+}
+
+/* --- BACKGROUND & ZOOM ISOLADO --- */
+.overlay {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  background: #000;
+  overflow: hidden;
+}
+
+.bg-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background:
+    linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.5)), url("bg.png");
+  background-size: cover;
+  background-position: center;
+  z-index: -1;
+  animation: bg-zoom 20s infinite ease-in-out;
+}
+
+@keyframes bg-zoom {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* --- BOTÃO FECHAR DISCRETO --- */
+#close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(197, 160, 89, 0.4);
+  color: #c5a059;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  z-index: 100;
+  border-radius: 4px;
+  transition: 0.3s;
+  -webkit-app-region: no-drag;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#close-btn:hover {
+  background: rgba(123, 29, 29, 0.8);
+  color: #fff;
+  border-color: #fff;
+}
+
+/* --- SISTEMA DE FAÍSCAS (CORRIGIDO) --- */
+.sparks-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.spark {
+  position: absolute;
+  background: #ffe1a8;
+  border-radius: 50%;
+  filter: blur(1px);
+  opacity: 0;
+  animation: fly-spark-advanced infinite linear;
+}
+
+.spark::before {
+  content: "";
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  background: rgba(255, 225, 168, 0.7);
+  border-radius: 50%;
+  animation: spark-blink 1s infinite alternate;
+}
+
+.spark::after {
+  content: "";
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: rgba(197, 160, 89, 0.5);
+  border-radius: 50%;
+  filter: blur(2px);
+  animation: spark-blink 2s infinite alternate;
+}
+
+@keyframes fly-spark-advanced {
+  0% {
+    transform: translateY(110vh) translateX(0) scale(1);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(-10vh) translateX(var(--drift, 50px))
+      scale(var(--scale, 1));
+    opacity: 0;
+  }
+}
+
+@keyframes spark-blink {
+  0% {
+    opacity: 0.2;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Tamanhos das faíscas */
+.spark:nth-child(1) {
+  width: 4px;
+  height: 4px;
+  left: 10%;
+}
+.spark:nth-child(2) {
+  width: 2px;
+  height: 2px;
+  left: 30%;
+}
+.spark:nth-child(3) {
+  width: 5px;
+  height: 5px;
+  left: 50%;
+}
+.spark:nth-child(4) {
+  width: 3px;
+  height: 3px;
+  left: 70%;
+}
+.spark:nth-child(5) {
+  width: 2px;
+  height: 2px;
+  left: 90%;
+}
+
+/* --- FLOATING CONTAINER (UI) --- */
+.floating-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+  pointer-events: none;
+  display: grid;
+  grid-template-areas:
+    "header"
+    "news"
+    "nav"
+    "footer";
+  grid-template-rows: auto 1fr auto auto;
+}
+
+.floating-container > * {
+  pointer-events: auto;
+  -webkit-app-region: no-drag;
+}
+
+.launcher-header {
+  grid-area: header;
+  text-align: center;
+  padding-top: 40px;
+}
+
+h1 {
+  font-family: "Cinzel", serif;
+  color: #fff;
+  font-size: 2.5rem;
+  letter-spacing: 4px;
+  text-shadow: 0 0 10px rgba(197, 160, 89, 0.8);
+}
+
+.news-section {
+  grid-area: news;
+  align-self: center;
+  justify-self: left;
+  padding-left: 50px;
+  color: #fff;
+}
+
+.news-section h2 {
+  font-family: "Cinzel", serif;
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  color: #c5a059;
+}
+
+.tag {
+  font-family: "Cinzel", serif;
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 3px 8px;
+  color: #fff;
+  border-radius: 2px;
+}
+
+.tag-news {
+  background-color: #1e522e;
+}
+.tag-patch {
+  background-color: #1a3c63;
+}
+.tag-event {
+  background-color: #7b1d1d;
+}
+
+/* Container das notícias */
+#news-container {
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 15px; /* Espaço para não colar no scroll */
+  margin-top: 10px; /* Espaço abaixo do título Latest Updates */
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* 🟢 Cria o espaçamento automático entre as notícias */
+}
+
+/* Cada item de notícia */
+.news-item {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Espaço entre a TAG (News/Patch) e o Texto */
+  padding: 5px 0; /* Respiro interno vertical */
+  border-bottom: 1px solid rgba(197, 160, 89, 0.1); /* Linha divisória sutil */
+}
+
+/* Ajuste do texto para não colar na tag */
+.news-item p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #e0e0e0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* Corta o texto com "..." se for muito longo */
+}
+
+/* Personalização do Scrollbar para ficar elegante */
+#news-container::-webkit-scrollbar {
+  width: 4px;
+}
+
+#news-container::-webkit-scrollbar-thumb {
+  background: rgba(197, 160, 89, 0.5);
+  border-radius: 10px;
+}
+
+.launcher-nav {
+  grid-area: nav;
+  align-self: center;
+  justify-self: center;
+  display: flex;
+  gap: 30px;
+  padding: 12px 30px;
+  background: rgba(15, 20, 25, 0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(197, 160, 89, 0.2);
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.launcher-nav a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-family: "Cinzel", serif;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+  transition: 0.3s;
+}
+
+.launcher-nav a:active {
+  transform: scale(0.95); /* Leve "pulso" ao clicar nos links */
+}
+
+.launcher-nav a:hover {
+  color: #c5a059;
+}
+
+.launcher-footer {
+  grid-area: footer;
+  align-self: end;
+  justify-self: center;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px;
+  background: rgba(15, 20, 25, 0.7);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(197, 160, 89, 0.3);
+  margin-bottom: 20px;
+}
+
+/* --- PROGRESS INFO (STATUS E DOWNLOAD) --- */
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /* Cor padrão para todos os textos da linha de progresso */
+  color: #c5a059;
+  font-size: 0.85rem;
+  margin-bottom: 5px;
+}
+
+#progress-percent {
+  color: #ffe1a8; /* Um pouco mais claro para destaque */
+  font-size: 1.1rem;
+  font-family: "Cinzel", serif;
+  font-weight: bold;
+}
+
+#status {
+  color: #c5a059;
+  font-family: "Cinzel", serif;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+#download-info {
+  color: #c5a059;
+  font-size: 0.8rem;
+  font-family: "Quicksand", sans-serif;
+  opacity: 0.9;
+}
+
+/* BARRA DE PROGRESSO */
+progress {
+  width: 100%;
+  height: 8px;
+  appearance: none;
+}
+
+progress::-webkit-progress-bar {
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+}
+
+progress::-webkit-progress-value {
+  background: linear-gradient(90deg, #8e6d31, #c5a059, #ffe1a8);
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(197, 160, 89, 0.5);
+}
+
+/* BOTÃO JOGAR */
+#play {
+  width: 200px;
+  align-self: flex-end;
+  padding: 12px;
+  font-family: "Cinzel", serif;
+  font-size: 1.2rem;
+  color: #000;
+  background: linear-gradient(#c5a059, #8e6d31);
+  border: 1px solid #ffd700;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+#play:active:not(:disabled) {
+  transform: translateY(0px); /* O botão "desce" ao clicar */
+  filter: brightness(0.9); /* Escurece levemente para simular pressão */
+}
+
+#play:hover:not(:disabled) {
+  filter: brightness(1.2);
+  transform: translateY(-2px);
+}
+
+#play:disabled {
+  background: #333;
+  color: #666;
+  border-color: #444;
+}

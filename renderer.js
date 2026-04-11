@@ -1,0 +1,146 @@
+const { ipcRenderer, shell } = require("electron");
+
+const playBtn = document.getElementById("play");
+const progress = document.getElementById("progress");
+const statusText = document.getElementById("status");
+const downloadInfo = document.getElementById("download-info");
+const percentText = document.getElementById("progress-percent"); // Novo ID do layout
+
+let totalSize = 0;
+
+console.log("RENDERER INICIOU ✅");
+
+playBtn.disabled = true;
+ipcRenderer.send("start-update");
+
+// 📊 Controle de Progresso e Percentual
+ipcRenderer.on("progress-bytes", (e, data) => {
+  const downloaded = data.downloaded;
+  const mbDownloaded = (downloaded / 1024 / 1024).toFixed(2);
+  const mbTotal = (totalSize / 1024 / 1024).toFixed(2);
+  const percent = totalSize ? Math.floor((downloaded / totalSize) * 100) : 0;
+
+  progress.value = percent;
+
+  if (percentText) {
+    percentText.innerText = `${percent}%`;
+  }
+
+  if (downloadInfo) {
+    downloadInfo.innerText = `⚔ ${mbDownloaded} MB / ${mbTotal} MB`;
+  }
+});
+
+ipcRenderer.on("total-size", (e, size) => {
+  totalSize = size;
+});
+
+ipcRenderer.on("status", (e, text) => {
+  if (statusText) statusText.innerText = text;
+
+  // Lista de ícones ou palavras que indicam erro/offline
+  const isOffline =
+    text.includes("✖") ||
+    text.toLowerCase().includes("offline") ||
+    text.toLowerCase().includes("indisponível");
+
+  if (isOffline) {
+    playBtn.disabled = true; // Esta linha é crucial para a trava
+    playBtn.style.filter = "grayscale(1)";
+    playBtn.innerText = "OFFLINE";
+    playBtn.style.cursor = "not-allowed"; // Muda o cursor para "bloqueado"
+  }
+});
+
+ipcRenderer.on("ready", () => {
+  playBtn.disabled = false;
+  if (percentText) percentText.innerText = "100%";
+  if (downloadInfo) downloadInfo.innerText = "";
+});
+
+// ▶ Iniciar jogo (Com trava de segurança)
+playBtn.onclick = () => {
+  // Verifica se o botão está desativado ou se o texto é OFFLINE
+  if (playBtn.disabled || playBtn.innerText === "OFFLINE") {
+    console.log("Acesso negado: Servidor Offline ou Atualização pendente.");
+    return; // Interrompe a execução aqui
+  }
+
+  ipcRenderer.send("play");
+};
+
+// ❌ Botão Fechar (Atualizado para o ID do novo layout)
+const closeBtn = document.getElementById("close-btn");
+if (closeBtn) {
+  closeBtn.onclick = () => window.close();
+}
+
+// 🌐 Links externos (ajustado para funcionar com links dentro da Nav)
+let registerUrl = "#"; // Valor inicial de segurança
+
+// 2. Escuta a configuração que o main.js vai enviar assim que a janela carregar
+ipcRenderer.on("config-data", (e, config) => {
+  registerUrl = config.registerUrl;
+  // Após receber as configs, carrega as notícias usando o IP do .env
+  loadNews(config.serverIp);
+});
+
+async function loadNews(serverIp) {
+  const newsContainer = document.getElementById("news-container");
+  const newsUrl = `http://${serverIp}/patch/news.json`;
+
+  try {
+    const response = await fetch(newsUrl);
+    const news = await response.json();
+
+    newsContainer.innerHTML = ""; // Limpa o "Carregando..."
+
+    news.forEach((item) => {
+      const newsItem = document.createElement("div");
+      newsItem.className = "news-item";
+
+      newsItem.innerHTML = `
+        <span class="tag tag-${item.tag}">${item.tagName}</span>
+        <p>${item.title}</p>
+      `;
+
+      newsContainer.appendChild(newsItem);
+    });
+  } catch (error) {
+    console.error("Erro ao carregar notícias:", error);
+    newsContainer.innerHTML = "<p>Não foi possível carregar as notícias.</p>";
+  }
+}
+
+// 3. Atualiza o evento de clique para usar a variável dinâmica
+const registerLink = document.getElementById("register-link");
+if (registerLink) {
+  registerLink.onclick = (e) => {
+    e.preventDefault();
+    if (registerUrl && registerUrl !== "#") {
+      shell.openExternal(registerUrl);
+    } else {
+      console.warn("URL de registo ainda não carregada ou inválida.");
+    }
+  };
+}
+
+// ✨ Lógica das Faíscas (Movida para dentro de uma função para garantir execução)
+function initSparks() {
+  const sparks = document.querySelectorAll(".spark");
+  sparks.forEach((spark) => {
+    const duration = (Math.random() * 6 + 4).toFixed(1) + "s";
+    const delay = (Math.random() * 5).toFixed(1) + "s";
+    const left = (Math.random() * 90 + 5).toFixed(1) + "%";
+    const drift = (Math.random() * 300 - 150).toFixed(0) + "px";
+    const scale = (Math.random() * 1 + 0.5).toFixed(1);
+
+    spark.style.animationDuration = duration;
+    spark.style.animationDelay = delay;
+    spark.style.left = left;
+    spark.style.setProperty("--drift", drift);
+    spark.style.setProperty("--scale", scale);
+  });
+}
+
+initSparks();

@@ -1,0 +1,41 @@
+# Dependências
+node_modules/
+jspm_packages/
+
+# Build do Electron e Binários
+dist/
+release/
+*.exe
+*.msi
+*.zip
+*.dmg
+
+# Logs e Cache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.eslintcache
+.cache/
+
+# Sistema e IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Arquivos do Jogo (Evite subir o client do Talisman para o Git)
+/download/
+/files_to_update/
+client.exe
+*.dll
+*.ini
+*.bat
+*.lua
+*.csv
+/music/
+/script/
+/local/
+/misc/
+
+# Ambiente
+.env

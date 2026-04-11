@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Talisman Launcher</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Quicksand:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+
+  <body>
+    <div class="overlay">
+      <div class="bg-layer"></div>
+
+      <button id="close-btn" title="Fechar">✕</button>
+
+      <div class="sparks-container">
+        <div class="spark"></div>
+        <div class="spark"></div>
+        <div class="spark"></div>
+        <div class="spark"></div>
+        <div class="spark"></div>
+      </div>
+
+      <div class="floating-container">
+        <header class="launcher-header">
+          <h1>TALISMAN ONLINE</h1>
+        </header>
+
+        <section class="news-section">
+          <h2>Latest Updates</h2>
+          <div id="news-container">
+            <p style="color: #c5a059">Carregando crônicas...</p>
+          </div>
+        </section>
+
+        <nav class="launcher-nav">
+          <a href="#" id="register-link"><span class="icon">Registro</span></a>
+          <a href="#"><span class="icon">Website</span></a>
+          <a href="#"><span class="icon">Shop</span></a>
+          <a href="#"><span class="icon">Support</span></a>
+          <a href="#"><span class="icon">Top Up</span></a>
+        </nav>
+
+        <footer class="launcher-footer">
+          <div class="progress-info">
+            <span id="progress-percent">0%</span>
+            <span id="status">📜 Lendo Pergaminhos...</span>
+            <span id="download-info">⬇️ 0 MB / 0 MB</span>
+          </div>
+
+          <progress id="progress" value="0" max="100"></progress>
+
+          <button id="play" disabled>JOGAR</button>
+        </footer>
+      </div>
+    </div>
+
+    <script src="renderer.js"></script>
+  </body>
+</html>
