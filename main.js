@@ -36,8 +36,8 @@ function createWindow() {
     // 2. ENVIAR CONFIGURAÇÕES PARA O RENDERER
     // Se não houver .env (em produção), usamos valores padrão
     win.webContents.send("config-data", {
-      registerUrl: process.env.REGISTER_URL || "http://192.168.1.221",
-      serverIp: process.env.SERVER_IP || "192.168.1.221",
+      registerUrl: process.env.REGISTER_URL || "http://66.55.64.1",
+      serverIp: process.env.SERVER_IP || "66.55.64.1",
     });
   });
 }

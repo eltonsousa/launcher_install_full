@@ -12,7 +12,7 @@ const clientPath =
   process.env.PORTABLE_EXECUTABLE_DIR ||
   (app.isPackaged ? path.dirname(app.getPath("exe")) : process.cwd());
 
-const PATCH_URL = "http://192.168.1.221/patch/patch.json";
+const PATCH_URL = "http://66.55.64.1/patch/patch.json";
 
 function getFileHash(filePath) {
   return new Promise((resolve) => {
