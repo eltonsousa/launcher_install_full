@@ -78,11 +78,17 @@ if (closeBtn) {
 // 🌐 Links externos (ajustado para funcionar com links dentro da Nav)
 let registerUrl = "#"; // Valor inicial de segurança
 
-// 2. Escuta a configuração que o main.js vai enviar assim que a janela carregar
-ipcRenderer.on("config-data", (e, config) => {
-  registerUrl = config.registerUrl;
-  // Após receber as configs, carrega as notícias usando o IP do .env
-  loadNews(config.serverIp);
+ipcRenderer.on("config-data", (e, data) => {
+  registerUrl = data.registerUrl;
+
+  const titleElem = document.getElementById("game-title");
+  if (titleElem) {
+    titleElem.innerText = data.gameName.toUpperCase();
+  }
+
+  if (data.serverIp) {
+    loadNews(data.serverIp);
+  }
 });
 
 async function loadNews(serverIp) {

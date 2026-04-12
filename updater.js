@@ -7,12 +7,13 @@ const { app } = require("electron");
 const http = require("http");
 const https = require("https");
 const { URL } = require("url");
+const gameConfig = require("./config");
 
 const clientPath =
   process.env.PORTABLE_EXECUTABLE_DIR ||
   (app.isPackaged ? path.dirname(app.getPath("exe")) : process.cwd());
 
-const PATCH_URL = "http://66.55.64.1/patch/patch.json";
+const PATCH_URL = gameConfig.patchUrl;
 
 function getFileHash(filePath) {
   return new Promise((resolve) => {

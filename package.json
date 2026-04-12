@@ -10,7 +10,7 @@
   },
   "build": {
     "appId": "com.talisman.launcher",
-    "productName": "Talisman Launcher",
+    "productName": "Talisman Kamatera",
     "directories": {
       "output": "dist"
     },
@@ -23,10 +23,8 @@
     }
   },
   "dependencies": {
-    "adm-zip": "^0.5.17",
     "axios": "^1.14.0",
     "core-util-is": "^1.0.3",
-    "dotenv": "^17.4.1",
     "unzipper": "^0.12.3"
   },
   "devDependencies": {
