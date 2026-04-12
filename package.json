@@ -10,12 +10,13 @@
   },
   "build": {
     "appId": "com.talisman.launcher",
-    "productName": "Talisman Launcher",
+    "productName": "Talisman Kamatera",
     "directories": {
       "output": "dist"
     },
     "files": [
-      "**/*"
+      "**/*",
+      ".env"
     ],
     "win": {
       "target": "portable",

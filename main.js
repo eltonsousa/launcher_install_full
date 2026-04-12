@@ -1,11 +1,16 @@
-require("dotenv").config();
-const { app, BrowserWindow, ipcMain } = require("electron");
-const { spawn } = require("child_process");
+const { app, BrowserWindow, ipcMain } = require("electron"); // Primeiro o app
 const path = require("path");
+const { spawn, exec } = require("child_process");
 const update = require("./updater");
-const { exec } = require("child_process");
 
-// 1. DEFINIÇÃO ÚNICA DO CAMINHO (Identifica onde o .exe está rodando)
+// 1. CONFIGURAÇÃO DO .ENV (Apenas uma vez e com o caminho dinâmico)
+const envPath = app.isPackaged
+  ? path.join(process.resourcesPath, ".env")
+  : path.join(__dirname, ".env");
+
+require("dotenv").config({ path: envPath });
+
+// 2. DEFINIÇÃO DO CAMINHO DO CLIENTE
 const clientPath = app.isPackaged
   ? path.dirname(app.getPath("exe"))
   : process.cwd();
@@ -13,15 +18,15 @@ const clientPath = app.isPackaged
 let win;
 
 function createWindow() {
-  console.log(">>> CRIANDO JANELA...");
+  console.log(">>> JANELA INICIADA | GAME:", process.env.CLIENT_NAME);
 
   win = new BrowserWindow({
     width: 900,
     height: 550,
-    title: "Talisman Launcher", // Nome fixo ou via process.env
+    // Plano B direto no título da janela
+    title: process.env.CLIENT_NAME || "Talisman Kamatera",
     resizable: false,
     maximizable: false,
-    fullscreenable: false,
     autoHideMenuBar: true,
     frame: false,
     webPreferences: {
@@ -33,11 +38,12 @@ function createWindow() {
   win.loadFile("index.html");
 
   win.webContents.on("did-finish-load", () => {
-    // 2. ENVIAR CONFIGURAÇÕES PARA O RENDERER
-    // Se não houver .env (em produção), usamos valores padrão
+    // 3. ENVIAR CONFIGURAÇÕES COM PLANO B (Fallback)
     win.webContents.send("config-data", {
       registerUrl: process.env.REGISTER_URL || "http://66.55.64.1",
       serverIp: process.env.SERVER_IP || "66.55.64.1",
+      // Se o .env falhar aqui, o Launcher ainda mostra o nome certo
+      gameName: process.env.CLIENT_NAME || "Talisman Kamatera",
     });
   });
 }

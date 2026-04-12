@@ -4,9 +4,11 @@ const playBtn = document.getElementById("play");
 const progress = document.getElementById("progress");
 const statusText = document.getElementById("status");
 const downloadInfo = document.getElementById("download-info");
-const percentText = document.getElementById("progress-percent"); // Novo ID do layout
+const percentText = document.getElementById("progress-percent");
 
 let totalSize = 0;
+let registerUrl = "#";
+let serverIp = ""; // Declarando a variável globalmente
 
 console.log("RENDERER INICIOU ✅");
 
@@ -21,14 +23,9 @@ ipcRenderer.on("progress-bytes", (e, data) => {
   const percent = totalSize ? Math.floor((downloaded / totalSize) * 100) : 0;
 
   progress.value = percent;
-
-  if (percentText) {
-    percentText.innerText = `${percent}%`;
-  }
-
-  if (downloadInfo) {
+  if (percentText) percentText.innerText = `${percent}%`;
+  if (downloadInfo)
     downloadInfo.innerText = `⚔ ${mbDownloaded} MB / ${mbTotal} MB`;
-  }
 });
 
 ipcRenderer.on("total-size", (e, size) => {
@@ -38,72 +35,69 @@ ipcRenderer.on("total-size", (e, size) => {
 ipcRenderer.on("status", (e, text) => {
   if (statusText) statusText.innerText = text;
 
-  // Lista de ícones ou palavras que indicam erro/offline
   const isOffline =
     text.includes("✖") ||
     text.toLowerCase().includes("offline") ||
     text.toLowerCase().includes("indisponível");
 
   if (isOffline) {
-    playBtn.disabled = true; // Esta linha é crucial para a trava
+    playBtn.disabled = true;
     playBtn.style.filter = "grayscale(1)";
     playBtn.innerText = "OFFLINE";
-    playBtn.style.cursor = "not-allowed"; // Muda o cursor para "bloqueado"
+    playBtn.style.cursor = "not-allowed";
   }
 });
 
 ipcRenderer.on("ready", () => {
   playBtn.disabled = false;
+  playBtn.style.filter = "none";
+  playBtn.innerText = "JOGAR";
+  playBtn.style.cursor = "pointer";
   if (percentText) percentText.innerText = "100%";
   if (downloadInfo) downloadInfo.innerText = "";
 });
 
-// ▶ Iniciar jogo (Com trava de segurança)
-playBtn.onclick = () => {
-  // Verifica se o botão está desativado ou se o texto é OFFLINE
-  if (playBtn.disabled || playBtn.innerText === "OFFLINE") {
-    console.log("Acesso negado: Servidor Offline ou Atualização pendente.");
-    return; // Interrompe a execução aqui
-  }
+// 2. Escuta a configuração e CHAMA a função de notícias
+ipcRenderer.on("config-data", (e, data) => {
+  registerUrl = data.registerUrl;
+  serverIp = data.serverIp;
 
-  ipcRenderer.send("play");
-};
+  // Atualiza o título do jogo
+  ipcRenderer.on("config-data", (e, data) => {
+    // ... outras variaveis
+    const titleElem = document.getElementById("game-title");
+    if (titleElem && data.gameName) {
+      titleElem.innerText = data.gameName.toUpperCase();
+    }
+  });
 
-// ❌ Botão Fechar (Atualizado para o ID do novo layout)
-const closeBtn = document.getElementById("close-btn");
-if (closeBtn) {
-  closeBtn.onclick = () => window.close();
-}
+  // >>> AQUI ESTÁ A CHAMADA QUE FALTA <<<
+  loadNews(serverIp);
 
-// 🌐 Links externos (ajustado para funcionar com links dentro da Nav)
-let registerUrl = "#"; // Valor inicial de segurança
-
-// 2. Escuta a configuração que o main.js vai enviar assim que a janela carregar
-ipcRenderer.on("config-data", (e, config) => {
-  registerUrl = config.registerUrl;
-  // Após receber as configs, carrega as notícias usando o IP do .env
-  loadNews(config.serverIp);
+  console.log("Configurações recebidas:", data);
 });
 
-async function loadNews(serverIp) {
+// 📰 Função para carregar as notícias
+async function loadNews(ip) {
   const newsContainer = document.getElementById("news-container");
-  const newsUrl = `http://${serverIp}/patch/news.json`;
+  if (!newsContainer) return;
+
+  const newsUrl = `http://${ip}/patch/news.json?t=${Date.now()}`; // ?t= evita cache
 
   try {
     const response = await fetch(newsUrl);
-    const news = await response.json();
+    if (!response.ok) throw new Error("Erro na rede");
 
-    newsContainer.innerHTML = ""; // Limpa o "Carregando..."
+    const news = await response.json();
+    newsContainer.innerHTML = "";
 
     news.forEach((item) => {
       const newsItem = document.createElement("div");
       newsItem.className = "news-item";
-
       newsItem.innerHTML = `
         <span class="tag tag-${item.tag}">${item.tagName}</span>
         <p>${item.title}</p>
       `;
-
       newsContainer.appendChild(newsItem);
     });
   } catch (error) {
@@ -112,20 +106,30 @@ async function loadNews(serverIp) {
   }
 }
 
-// 3. Atualiza o evento de clique para usar a variável dinâmica
+// ▶ Iniciar jogo
+playBtn.onclick = () => {
+  if (playBtn.disabled || playBtn.innerText === "OFFLINE") return;
+  ipcRenderer.send("play");
+};
+
+// ❌ Botão Fechar
+const closeBtn = document.getElementById("close-btn");
+if (closeBtn) {
+  closeBtn.onclick = () => window.close();
+}
+
+// 🌐 Link de Registro
 const registerLink = document.getElementById("register-link");
 if (registerLink) {
   registerLink.onclick = (e) => {
     e.preventDefault();
     if (registerUrl && registerUrl !== "#") {
       shell.openExternal(registerUrl);
-    } else {
-      console.warn("URL de registo ainda não carregada ou inválida.");
     }
   };
 }
 
-// ✨ Lógica das Faíscas (Movida para dentro de uma função para garantir execução)
+// ✨ Lógica das Faíscas
 function initSparks() {
   const sparks = document.querySelectorAll(".spark");
   sparks.forEach((spark) => {
