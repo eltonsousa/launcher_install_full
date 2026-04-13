@@ -10,7 +10,7 @@
   },
   "build": {
     "appId": "com.talisman.launcher",
-    "productName": "Talisman Kamatera",
+    "productName": "Talisman launcher",
     "directories": {
       "output": "dist"
     },
