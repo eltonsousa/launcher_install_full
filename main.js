@@ -28,7 +28,7 @@ function createWindow() {
   });
 
   win.loadFile("index.html");
-  win.webContents.openDevTools({ mode: "detach" });
+  // win.webContents.openDevTools({ mode: "detach" });
   win.webContents.on("did-finish-load", () => {
     // Envia os dados do config.js para o renderer
     win.webContents.send("config-data", {
