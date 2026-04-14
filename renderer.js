@@ -70,10 +70,21 @@ playBtn.onclick = () => {
 };
 
 // ❌ Botão Fechar (Atualizado para o ID do novo layout)
-const closeBtn = document.getElementById("close-btn");
-if (closeBtn) {
-  closeBtn.onclick = () => window.close();
-}
+// const closeBtn = document.getElementById("close-btn");
+// closeBtn.onclick = () => {
+//   ipcRenderer.send("close-app");
+// };
+
+document.addEventListener("DOMContentLoaded", () => {
+  const closeBtn = document.getElementById("close-btn");
+
+  if (closeBtn) {
+    closeBtn.addEventListener("click", () => {
+      console.log("BOTÃO CLICADO 🔥");
+      ipcRenderer.send("close-app");
+    });
+  }
+});
 
 // 🌐 Links externos (ajustado para funcionar com links dentro da Nav)
 let registerUrl = "#"; // Valor inicial de segurança
@@ -130,23 +141,3 @@ if (registerLink) {
     }
   };
 }
-
-// ✨ Lógica das Faíscas (Movida para dentro de uma função para garantir execução)
-function initSparks() {
-  const sparks = document.querySelectorAll(".spark");
-  sparks.forEach((spark) => {
-    const duration = (Math.random() * 6 + 4).toFixed(1) + "s";
-    const delay = (Math.random() * 5).toFixed(1) + "s";
-    const left = (Math.random() * 90 + 5).toFixed(1) + "%";
-    const drift = (Math.random() * 300 - 150).toFixed(0) + "px";
-    const scale = (Math.random() * 1 + 0.5).toFixed(1);
-
-    spark.style.animationDuration = duration;
-    spark.style.animationDelay = delay;
-    spark.style.left = left;
-    spark.style.setProperty("--drift", drift);
-    spark.style.setProperty("--scale", scale);
-  });
-}
-
-initSparks();

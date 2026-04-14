@@ -60,3 +60,7 @@ ipcMain.on("play", () => {
     app.quit();
   }, 1000);
 });
+
+ipcMain.on("close-app", () => {
+  app.quit();
+});
