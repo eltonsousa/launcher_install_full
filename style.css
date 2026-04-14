@@ -69,7 +69,8 @@ body {
 }
 
 .right-panel {
-  font-weight: 800;
+  font-weight: 500;
+  color: #ffe1a8;
   position: absolute;
   top: 126px;
   right: 150px;

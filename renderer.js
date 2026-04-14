@@ -63,7 +63,7 @@ playBtn.onclick = () => {
   // Verifica se o botão está desativado ou se o texto é OFFLINE
   if (playBtn.disabled || playBtn.innerText === "OFFLINE") {
     console.log("Acesso negado: Servidor Offline ou Atualização pendente.");
-    return; // Interrompe a execução aqui
+    return;
   }
 
   ipcRenderer.send("play");
@@ -90,6 +90,8 @@ document.addEventListener("DOMContentLoaded", () => {
 let registerUrl = "#"; // Valor inicial de segurança
 
 ipcRenderer.on("config-data", (e, data) => {
+  console.log("CONFIG RECEBIDA ⚙️", data);
+
   registerUrl = data.registerUrl;
 
   const titleElem = document.getElementById("game-title");
@@ -134,6 +136,10 @@ const registerLink = document.getElementById("register-link");
 if (registerLink) {
   registerLink.onclick = (e) => {
     e.preventDefault();
+
+    console.log("CLICOU REGISTER 🌐");
+    console.log("URL:", registerUrl);
+
     if (registerUrl && registerUrl !== "#") {
       shell.openExternal(registerUrl);
     } else {
