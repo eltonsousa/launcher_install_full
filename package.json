@@ -1,6 +1,6 @@
 {
   "name": "launcher",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Launcher para Talisman Online",
   "author": "Elton Sousa",
   "main": "main.js",
