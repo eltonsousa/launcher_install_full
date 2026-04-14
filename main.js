@@ -14,10 +14,13 @@ function createWindow() {
   win = new BrowserWindow({
     width: 900,
     height: 550,
+    transparent: true,
     title: gameConfig.gameName, // Título dinâmico
     resizable: false,
     maximizable: false,
     frame: false,
+    hasShadow: false,
+    backgroundColor: "#00000000",
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -25,7 +28,7 @@ function createWindow() {
   });
 
   win.loadFile("index.html");
-
+  win.webContents.openDevTools({ mode: "detach" });
   win.webContents.on("did-finish-load", () => {
     // Envia os dados do config.js para o renderer
     win.webContents.send("config-data", {
