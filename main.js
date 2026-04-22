@@ -53,7 +53,7 @@ ipcMain.on("start-update", async () => {
 
 ipcMain.on("play", () => {
   const realPath = process.env.PORTABLE_EXECUTABLE_DIR || clientPath;
-  exec(`start "" "Play.bat"`, { cwd: realPath }, (err) => {
+  exec(`start "" "Start_Game.bat"`, { cwd: realPath }, (err) => {
     if (err) console.error("Erro ao abrir:", err);
   });
   setTimeout(() => {
