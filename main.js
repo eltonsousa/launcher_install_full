@@ -43,11 +43,12 @@ app.whenReady().then(createWindow);
 
 ipcMain.on("start-update", async () => {
   try {
-    await update(win);
-    win.webContents.send("ready");
+    await update(win); // Espera o 'return true' do updater.js
+    win.webContents.send("ready"); // Envia o sinal para o renderer.js
   } catch (error) {
+    console.error(error);
     win.webContents.send("status", "! Erro na atualização.");
-    win.webContents.send("ready");
+    win.webContents.send("ready"); // Libera o botão mesmo com erro para o user tentar jogar
   }
 });
 

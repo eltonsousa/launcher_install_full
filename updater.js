@@ -183,15 +183,29 @@ async function update(win) {
 
         // Processo de Extração para arquivos ZIP
         if (file.path.endsWith(".zip")) {
-          win.webContents.send("status", "📦 Extraindo arquivos...");
+          win.webContents.send("status", "📦 Abrindo pacote de arquivos...");
+
           const directory = await unzipper.Open.file(dest);
+          const totalFiles = directory.files.length;
+          let count = 0;
 
           for (const entry of directory.files) {
+            count++;
+            const fileName = path.basename(entry.path);
+
+            // Envia o nome do arquivo atual e a contagem para o status
+            win.webContents.send(
+              "status",
+              `📦 Extraindo (${count}/${totalFiles}): ${fileName}`,
+            );
+
             const fullPath = path.join(clientPath, entry.path);
+
             if (entry.type === "Directory") {
               fs.mkdirSync(fullPath, { recursive: true });
             } else {
               fs.mkdirSync(path.dirname(fullPath), { recursive: true });
+
               await new Promise((res, rej) => {
                 entry
                   .stream()
@@ -201,7 +215,9 @@ async function update(win) {
               });
             }
           }
-          fs.unlinkSync(dest); // Deleta o zip após extrair com sucesso
+
+          fs.unlinkSync(dest); // Remove o zip após terminar tudo
+          win.webContents.send("status", "✔ Instalação concluída com sucesso!");
         }
       } catch (err) {
         console.error("ERRO:", err);
@@ -218,6 +234,7 @@ async function update(win) {
   }
 
   win.webContents.send("status", "✔ Tudo pronto!");
+  return true;
 }
 
 module.exports = update;
