@@ -148,11 +148,27 @@ async function update(win) {
 
   win.webContents.send("total-size", totalSize);
 
+  // Verificação de existência do jogo via arquivo .bat
+  const arquivosNoDiretorio = fs.readdirSync(clientPath);
+  const jogoJaInstalado = arquivosNoDiretorio.some((file) =>
+    file.endsWith(".bat"),
+  );
+
   for (let file of allFiles) {
     const dest = path.join(clientPath, file.path);
     const serverHash = file.hash.toLowerCase();
-    let localHash = await getFileHash(dest);
 
+    // REGRA DE OURO: Se for o ZIP e já houver um .bat, pulamos o download
+    if (file.path.endsWith(".zip") && jogoJaInstalado) {
+      console.log(`> Pulando ${file.path} pois o jogo já está instalado.`);
+      totalDownloadedRef.value += file.actualSize;
+      win.webContents.send("progress-bytes", {
+        downloaded: totalDownloadedRef.value,
+      });
+      continue;
+    }
+
+    let localHash = await getFileHash(dest);
     let precisaBaixar = localHash !== serverHash;
 
     if (precisaBaixar) {
@@ -161,35 +177,21 @@ async function update(win) {
       try {
         await downloadFile(encodeURI(file.url), dest, win, totalDownloadedRef);
 
-        // 🔍 VALIDAÇÃO BÁSICA
+        // Validação de tamanho para evitar arquivos corrompidos
         const stats = fs.statSync(dest);
-        if (stats.size < 1000) {
-          throw new Error("Arquivo incompleto");
-        }
+        if (stats.size < 1000) throw new Error("Arquivo incompleto");
 
-        // 📦 EXTRAÇÃO
+        // Processo de Extração para arquivos ZIP
         if (file.path.endsWith(".zip")) {
-          win.webContents.send("status", "📦 Extraindo...");
-
+          win.webContents.send("status", "📦 Extraindo arquivos...");
           const directory = await unzipper.Open.file(dest);
 
-          let count = 0;
-
           for (const entry of directory.files) {
-            count++;
-
-            win.webContents.send(
-              "status",
-              `📦 Extraindo (${count}/${directory.files.length})`,
-            );
-
             const fullPath = path.join(clientPath, entry.path);
-
             if (entry.type === "Directory") {
               fs.mkdirSync(fullPath, { recursive: true });
             } else {
               fs.mkdirSync(path.dirname(fullPath), { recursive: true });
-
               await new Promise((res, rej) => {
                 entry
                   .stream()
@@ -199,18 +201,15 @@ async function update(win) {
               });
             }
           }
-
-          fs.unlinkSync(dest);
-          win.webContents.send("status", "✔ Extração concluída");
+          fs.unlinkSync(dest); // Deleta o zip após extrair com sucesso
         }
       } catch (err) {
         console.error("ERRO:", err);
-
-        win.webContents.send("status", "✖ Falha no download/extracao");
-
+        win.webContents.send("status", "✖ Falha no download ou extração");
         throw err;
       }
     } else {
+      // Arquivo já está atualizado (comparação de Hash MD5)
       totalDownloadedRef.value += file.actualSize;
       win.webContents.send("progress-bytes", {
         downloaded: totalDownloadedRef.value,
