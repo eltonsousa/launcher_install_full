@@ -57,7 +57,6 @@ ipcRenderer.on("ready", () => {
   playBtn.disabled = false;
   playBtn.style.filter = "none";
   playBtn.style.cursor = "pointer";
-  playBtn.innerText = "JOGAR"; // Garante que o texto volte ao normal se estava "OFFLINE"
 
   if (statusText) statusText.innerText = "✔ Jogo pronto para iniciar!";
 });

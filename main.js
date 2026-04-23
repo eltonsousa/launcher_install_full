@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const path = require("path");
 const { exec } = require("child_process");
+const { spawn } = require("child_process");
 const update = require("./updater");
 const gameConfig = require("./config"); // Importa o novo config
 
@@ -54,9 +55,18 @@ ipcMain.on("start-update", async () => {
 
 ipcMain.on("play", () => {
   const realPath = process.env.PORTABLE_EXECUTABLE_DIR || clientPath;
-  exec(`start "" "Start_Game.bat"`, { cwd: realPath }, (err) => {
-    if (err) console.error("Erro ao abrir:", err);
+  const batFile = "Start_Game.bat";
+
+  // Usamos spawn para desvincular totalmente o processo
+  const child = spawn("cmd.exe", ["/c", batFile], {
+    cwd: realPath,
+    detached: true,
+    stdio: "ignore",
+    windowsHide: false, // Permite que o jogo apareça, mas desvincula o CMD
   });
+
+  child.unref(); // Corta o vínculo de referência
+
   setTimeout(() => {
     app.quit();
   }, 1000);
