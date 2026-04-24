@@ -1,9 +1,9 @@
 // config.js - Central de Configurações
 const config = {
-  gameName: "Talisman Origem",
-  serverIp: "144.217.210.249",
-  registerUrl: "http://144.217.210.249",
-  patchUrl: "http://144.217.210.249/patch/patch.json",
+  gameName: "Talisman New Update",
+  serverIp: "192.168.1.221",
+  registerUrl: "http://192.168.1.221",
+  patchUrl: "http://192.168.1.221/patch/patch.json",
 };
 
 module.exports = config;
